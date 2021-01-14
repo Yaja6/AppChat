@@ -1,0 +1,72 @@
+<div class="dividers">
+  <div class="textIn">
+    <ion-label class="titles" > 
+      Regístrate
+      </ion-label>
+      <div class="div-img-photo">
+        <ion-icon name="chatbubbles" style="width: 50;height: 50;"></ion-icon>
+      </div>
+  </div>
+</div>
+<ion-content class="sign-in-content">
+  <ion-segment (ionChange)="segmentChanged($event)" value="segment1">
+    <ion-segment-button value="segment1" >
+      <ion-label [ngClass]="segment1 ? 'withcolor':'nocolor'">Social</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="segment2">
+      <ion-label [ngClass]="segment2 ? 'withcolor':'nocolor'">Email</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+  <form *ngIf="segment2">
+    <ion-list class="inputs-list" lines="full">
+      <ion-item class="input-item">
+        <ion-label position="floating" color="primary" class="label-input">Nombre</ion-label>
+        <ion-input [(ngModel)]="user.name" type="text" name="name"></ion-input>
+      </ion-item>
+      <ion-item class="input-item">
+        <ion-label position="floating" color="primary" class="label-input">Correo electrónico</ion-label>
+        <ion-input [(ngModel)]="user.email" type="email" name="email" required></ion-input>
+      </ion-item>
+ 
+      <ion-item class="input-item">
+        <ion-label position="floating" color="primary" class="label-input">Contraseña</ion-label>
+        <ion-input [(ngModel)]="user.password" type="password" name="password" required></ion-input>
+      </ion-item> 
+      <ion-item class="input-item">
+        <ion-label position="floating" color="primary" class="label-input">Cambia tu foto de perfil</ion-label>
+        <br>
+        <ion-button class="plus-button" fill="clear">
+        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+        <input (change)="newPhotoProfile($event)" id="file-upload" type="file">
+      </ion-button>
+      </ion-item> 
+    </ion-list>
+    
+    <div class="div-img-photo">
+      <img [src]="user.photo" id="imgphotoProfile">   
+    </div>
+    <ion-button class="sign-in-btn" expand="block" (click)="onRegister()">
+      Registrarme
+    </ion-button>
+  </form>
+  <div *ngIf="segment1">
+    <br>
+  <div class="social-auth-options">
+    <ion-button (click)="onRegisterGoogle()" color="danger" expand="block" >
+      <ion-row>
+        <ion-col>
+          <ion-icon name="logo-google"></ion-icon>
+        </ion-col>
+        <ion-col>
+          Regístrate con Google
+        </ion-col>
+      </ion-row> 
+    </ion-button>
+  </div>
+</div>
+<ion-row class="sign-up-btn-wrapper">
+  <ion-button class="sign-up-btn" fill="clear" routerLink="/login" routerLinkActive="router-link-active">
+    Ya tienes cuenta?
+  </ion-button>
+</ion-row>
+</ion-content>

@@ -1,0 +1,46 @@
+<ion-header style="margin-bottom: 10px;">
+  <ion-toolbar>
+    <ion-buttons slot="start" >
+      <ion-button (click)="dismiss()">
+         <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+     
+    </ion-buttons>
+    <ion-title>Chat: {{userTo.name}} </ion-title>
+    
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+<div *ngFor="let msg of messages" class="msgs-container">
+    <ion-item *ngIf="msg.idUserTo === idCurrentUser && msg.idUserFrom === idUser || msg.idUserTo === idUser && msg.idUserFrom === idCurrentUser" class="msg-div">
+      <ion-col size="1.7" size-lg>
+         <img [src]="msg.uPhoto" class="photo-profile">
+      </ion-col>
+      <ion-col size="10.5" size-lg >
+        <ion-label class="user-msg" ><a><strong>{{msg.uName}}</strong></a></ion-label>
+        <div [ngClass]="msg.idUserFrom === idCurrentUser ? 'current-user':'text-msg'">
+          <p style="border: 1px;" >{{msg.textDes}}</p><br>
+          <img *ngIf="msg.img !== ''" [src]="msg.img" id="idea-img"> 
+          <a style="margin-left: 80%;" >{{msg.hour}}</a>
+        </div>
+      </ion-col>
+   </ion-item>
+</div>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons>
+      <ion-button slot="start" (click)="mostrar = true">
+        <label for="file-upload">
+          <ion-icon name="camera"></ion-icon>
+        </label>
+          <input (change)="newMessageImage($event)" id="file-upload" type="file" style="display:none;"/>
+      </ion-button>
+      <ion-input [(ngModel)]="textToEncrypt" placeholder="Escribe un mensaje..." class="input-msg" ></ion-input>
+      <ion-button (click)="saveMessage()"><ion-icon slot="icon-only" name="send-sharp"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <img *ngIf="mostrar === true" [src]="msg.img" id="idea-img">  
+</ion-footer>

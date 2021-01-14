@@ -1,0 +1,67 @@
+<div class="dividers">
+  <div class="textIn">
+    <ion-label class="titles" > 
+      Inicia Sesión
+      </ion-label>
+      <div class="div-img-photo">
+        <ion-icon name="chatbubbles" style="width: 50;height: 50;"></ion-icon>
+      </div>
+  </div>
+</div>
+
+<ion-content class="sign-in-content">
+  <ion-segment (ionChange)="segmentChanged($event)" value="segment1">
+    <ion-segment-button value="segment1">
+      <ion-label [ngClass]="segment1 ? 'withcolor':'nocolor'">Social</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="segment2">
+      <ion-label [ngClass]="segment2 ? 'withcolor':'nocolor'">Email</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+  <div *ngIf="segment1">
+    <br>
+    <div class="social-auth-options">
+      <ion-button type="submit" color="danger" expand="block" (click)="onLoginGoogle()">
+        <ion-row>
+          <ion-col>
+            <ion-icon name="logo-google"></ion-icon>
+          </ion-col>
+          <ion-col>
+            Ingresar con Google
+          </ion-col>
+        </ion-row> 
+      </ion-button>
+    </div>
+  </div>
+  <form *ngIf="segment2">
+      <ion-item class="input-item">
+        <ion-label position="floating" color="primary" class="label-input">Correo electrónico</ion-label>
+        <ion-input type="email" [(ngModel)]="user.email" name="email"></ion-input>
+      </ion-item>
+      <ion-item class="input-item">
+        <ion-label position="floating" color="primary" class="label-input">Contraseña</ion-label>
+        <ion-input type="password" 
+          [(ngModel)]="user.password" 
+          class="form-control" 
+          name="password">
+        </ion-input>
+      </ion-item>
+    <ion-button class="sign-in-btn" expand="block"(click)="onLogin()">
+      Ingresar
+    </ion-button>
+  
+    <ion-row class="sign-up-btn-wrapper">
+      <ion-button class="reset-password-btn" fill="clear" routerLink="/reset-password" >
+        Olvidaste tu contraseña?
+      </ion-button>
+    </ion-row>  
+  </form>
+  <ion-row class="sign-up-btn-wrapper">  
+      <ion-button class="sign-up-btn" fill="clear" routerLink="../register">
+        No tienes una cuenta?
+      </ion-button>
+  </ion-row>
+  
+
+ 
+</ion-content>

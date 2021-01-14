@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()" >
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="start">
+      <img  [src]="user.photo" class="user-photo-profile" />
+    </ion-buttons>
+    <ion-title>{{user.name}}</ion-title>
+   
+    
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    <ion-label color="warning">Seleccione un usuario para enviar mensajes. </ion-label>
+  </ion-item>
+  <div *ngFor= "let user of users" class="publications-container">
+    <div>
+      <table style="margin: 10px;" width = 100%>
+        <tr *ngIf="user.uid !== idCurrentUser">
+          <td width="40"><img [src]="user.photo" class="user-photo-profile" /></td>
+          <td style="text-align: left;" (click)="modalMessage(user.uid)">
+            <a class="title"><strong>{{user.name}}</strong></a>
+          </td>
+          <td width="90"><ion-buttons>
+            <ion-button>
+              <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons></td>
+        </tr>
+      </table>
+     </div>
+  </div>
+</ion-content>
