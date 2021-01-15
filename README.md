@@ -4,11 +4,41 @@
 
 Descripción de las principales funciones usadas.
 
+## Interfaces creadas: userInterface y messageInterface dentro de la carpeta **models**
+
+**user.interface.ts**
+```
+export interface UserInterface{
+    uid: string;
+    email: string;
+    name?: string;
+    photo?: string;
+    password: string;
+    emailVerified: boolean;
+}
+```
+**msg.interface.ts**
+```
+export interface MessageInterface{
+    id: string;
+    idUserTo: string;
+    idUserFrom: string;
+    text: string;
+    img?: string;
+    textDes: string;
+    uPhoto?: string;
+    uName?: string;
+    date?: Date;
+    hour?: string;
+}
+
+```
+
 ## Servicios creados para manejar la base de datos Firebase
 
 _Se manejarán los servicios: Storage, Cloud Store y Authentication_
 
-###auth.service.ts
+### auth.service.ts
 
 **Registro de usuario con email y contraseña dentro de Firebase**
 
@@ -72,7 +102,7 @@ _Se manejarán los servicios: Storage, Cloud Store y Authentication_
   }
 ```
 
-###firestore.service.ts
+### firestore.service.ts
 
 **createDoc()** permite crear un documento dentro de Firebase, tomando los datos, una ruta donde va a guardarse y el id del documento
 
@@ -125,7 +155,7 @@ Se usa un observador para que retorno la colección del tipo <tipo> de la base d
   }
 ```
 
-###firestorage.service.ts
+### firestorage.service.ts
 
 **uploadImage()** permite guardar archivos (en este imágenes) dentro del servicio Storage de Firebase. Como parámetros usa una ruta donde se guardarán las imágenes y un nombre del archivo. Además retorna la URL de la imagen guardada.
 
@@ -150,7 +180,7 @@ Se usa un observador para que retorno la colección del tipo <tipo> de la base d
 
 # Componentes creados:🚀
 
-##Register
+## Register
 
 _En el componente html se crean campos para que el usuario se registre_
 
@@ -283,7 +313,7 @@ Se declara una variable **user** del tipo **UserIterface** que almacena los dato
   }
 ```
 
-##Home
+## Home
 
 _Se muestran los usuarios registrados para poder iniciar un chat._
 
@@ -291,6 +321,20 @@ Dentro de **home.component.ts**
 
 users: UserInterface[] = []; -> declaro un arreglo de usuarios de tipo UserInterface
 
+Para tomar el id del usuario actual y como el controlador es el primero en ejecutarse, dentro de este se tomará el estado de autenticación del usuario
+
+```
+this.authSvc.stateAuth().subscribe(res => {
+      console.log(res);
+      if (res != null){
+        this.idCurrentUser = res.uid;
+        this.getUserInfo(this.idCurrentUser);
+        console.log('id ini', this.idCurrentUser);
+      }else{
+        this.initUser();
+      }
+    });
+```
 **getUsers()**: Toma los usuarios registrados de la base de datos los envía a un arreglo de tipo UserInterface. Usa el método getCollection desde el servicio firestore para tomar los datos guardados
 
 ```
@@ -302,108 +346,162 @@ users: UserInterface[] = []; -> declaro un arreglo de usuarios de tipo UserInter
   }
 ```
 
-
-
-
-##Login
-###Register
-###Modal: Chat
-
-
-Mira **Deployment** para conocer como desplegar el proyecto.
-
-
-### Pre-requisitos 📋
-
-_Que cosas necesitas para instalar el software y como instalarlas_
+**getUserInfo()**: Toma los datos de la base de datos dada una id
 
 ```
-Da un ejemplo
+ getUserInfo(uid: string){ // trae info de la bd
+    const path = 'Users/';
+    this.firestoreService.getDoc<UserInterface>(path, uid).subscribe( res => {
+      this.user = res;
+    });
+  }
 ```
-
-### Instalación 🔧
-
-_Una serie de ejemplos paso a paso que te dice lo que debes ejecutar para tener un entorno de desarrollo ejecutandose_
-
-_Dí cómo será ese paso_
-
-```
-Da un ejemplo
-```
-
-_Y repite_
+**modalMessage()**: Abrirá el modal para iniciar un chat 
 
 ```
-hasta finalizar
+  async modalMessage(id: string) {
+    const modal = await this.modalController.create({
+      component: ChatPage,
+      componentProps: {
+        idUser: id
+      }
+    });
+    return await modal.present();
+  }
 ```
 
-_Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para una pequeña demo_
+## Modal: Chat
 
-## Ejecutando las pruebas ⚙️
+_En el componente html se mostrará un chat y los mensajes del usuario con otro_
 
-_Explica como ejecutar las pruebas automatizadas para este sistema_
+Dentro de **chat.page.ts**
 
-### Analice las pruebas end-to-end 🔩
-
-_Explica que verifican estas pruebas y por qué_
+Se declara una variable de tipo MessageInterface que guardará los atributos del mensaje: Tendrá un id de usuario que envía y el que recibe el mensaje, el texto encriptado y el texto desencriptado (principales)
 
 ```
-Da un ejemplo
+msg: MessageInterface = {
+    id: '',
+    idUserTo: '',
+    idUserFrom: '',
+    text: '',
+    img: '',
+    uName: '',
+    uPhoto: '',
+    date: new Date(),
+    hour: '',
+    textDes: ''
+  };
 ```
 
-### Y las pruebas de estilo de codificación ⌨️
-
-_Explica que verifican estas pruebas y por qué_
+Además se declaran dos variables del tipo UserInterface para poder tomar los datos (id) del usuario actual (quién envía el mensaje -> userFrom) y del usuario a quien va dirigido el mensaje (userTo).
 
 ```
-Da un ejemplo
+  userFrom: UserInterface = {
+    uid: '',
+    name: '',
+    email: '',
+    photo: '',
+    password: '',
+    emailVerified: false,
+  };
+  userTo: UserInterface = {
+    uid: '',
+    name: '',
+    email: '',
+    photo: '',
+    password: '',
+    emailVerified: false,
+  };
+```
+A continuación se declara un arreglo de mensajes igual donde se almacenarán los mensajes tomados desde la base de datos.
+
+messages: MessageInterface[] = [];
+
+**saveMessage()**: Creará un nuevo documento dentro del path 'Messages/' donde tomará los datos del mensaje traídos desde el componente html. Una vez aquí, el texto se encripta con CryptoJS instalado previamente en el proyecto. Este texto encriptado se guarda como atributo del mensaje y luego se lo desencripta con CryptoJS y se lo guarda en **textDes** que también va a la variable **msg**. Además toma la imagen cargada en caso de que el usuario lo haga.
+
+```
+  async saveMessage(){
+    const path = 'Messages/';
+    const name = this.msg.id;
+    this.msg.id = this.firestoreService.getId();
+    this.msg.uName = this.uName;
+    this.msg.uPhoto = this.uPhoto;
+    this.msg.idUserTo = this.idUser;
+    this.msg.idUserFrom = this.idCurrentUser;
+    this.msg.text = CryptoJS.AES.encrypt(this.textToEncrypt.trim(), this.passEncrypt.trim()).toString();
+    this.msg.textDes = CryptoJS.AES.decrypt(this.msg.text.trim(), this.passEncrypt.trim()).toString(CryptoJS.enc.Utf8);
+    if (this.newFile !== undefined){
+      this.presentLoading();
+      const res = await this.fireStorageService.uploadImage(this.newFile, path, name);
+      this.msg.img = res;
+    }
+    this.firestoreService.createDoc(this.msg, path, this.msg.id).then(res => {
+      this.textToEncrypt = '';
+      this.msg.img = '';
+      this.mostrar = false;
+      console.log('Mensaje enviado!');
+    }).catch (err => {
+      console.log(err);
+    });
+  }
+```
+**getCurrentUserInfo()**: Traerá la información del usuario actual, lo más importante es su ID que toma desde el momento que se inicia el contructor para añadir al mensaje que se va a enviar y guardarlo como **idUserFrom**.
+
+```
+  getCurrentUserInfo(uid: string){ // trae info de la bd
+    const path = 'Users/';
+    this.firestoreService.getDoc<UserInterface>(path, uid).subscribe( res => {
+      this.userFrom = res;
+      this.uName = this.userFrom.name;
+      this.uPhoto = this.userFrom.photo;
+    });
+  }
+```
+**getUserInfo()**: Traerá la información del usuario al que se le va a enviar el mensaje, para esto se usa la ID que recibe el modal cada vez que el usuario abre el modal de un usuario de la lista del home, así se añade al mensaje el atributo **idUserTo**.
+
+```
+  getCurrentUserInfo(uid: string){ // trae info de la bd
+    const path = 'Users/';
+    this.firestoreService.getDoc<UserInterface>(path, uid).subscribe( res => {
+      this.userFrom = res;
+      this.uName = this.userFrom.name;
+      this.uPhoto = this.userFrom.photo;
+    });
+  }
+```
+**getmsgs()**: Traerá todos los mensajes de la base de datos y se los pasa a la variable messages[]
+
+```
+  getmsgs(){
+    const as = this.firestoreService.getCollection<MessageInterface>(this.path).subscribe( res => {  // res - respuesta del observador
+    this.messages = res;
+    });
+  }
+```
+**formatAMPM()**: Convierte la hora guardada dentro de firebase con formato -> timestamp a hh:mm 
+
+```
+  formatAMPM() {
+    const  hours = this.msg.date.getHours();
+    const minutes = this.msg.date.getMinutes();
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    const strTime = hours + ':' + minutes + ' ' + ampm;
+    this.msg.hour = strTime;
+  }
+```
+**newMessageImage()**: Toma un evento del componente html y carga la imagen hacia el atributo **img** de **msg**
+
+```
+  newMessageImage(event: any){
+    if (event.target.files && event.target.files[0]){
+      this.newFile = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = ((image) => {
+        this.msg.img = image.target.result as string;
+      });
+      reader.readAsDataURL(event.target.files[0]);
+
+    }
+  }
 ```
 
-## Despliegue 📦
-
-_Agrega notas adicionales sobre como hacer deploy_
-
-## Construido con 🛠️
-
-_Menciona las herramientas que utilizaste para crear tu proyecto_
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - El framework web usado
-* [Maven](https://maven.apache.org/) - Manejador de dependencias
-* [ROME](https://rometools.github.io/rome/) - Usado para generar RSS
-
-## Contribuyendo 🖇️
-
-Por favor lee el [CONTRIBUTING.md](https://gist.github.com/villanuevand/xxxxxx) para detalles de nuestro código de conducta, y el proceso para enviarnos pull requests.
-
-## Wiki 📖
-
-Puedes encontrar mucho más de cómo utilizar este proyecto en nuestra [Wiki](https://github.com/tu/proyecto/wiki)
-
-## Versionado 📌
-
-Usamos [SemVer](http://semver.org/) para el versionado. Para todas las versiones disponibles, mira los [tags en este repositorio](https://github.com/tu/proyecto/tags).
-
-## Autores ✒️
-
-_Menciona a todos aquellos que ayudaron a levantar el proyecto desde sus inicios_
-
-* **Andrés Villanueva** - *Trabajo Inicial* - [villanuevand](https://github.com/villanuevand)
-* **Fulanito Detal** - *Documentación* - [fulanitodetal](#fulanito-de-tal)
-
-También puedes mirar la lista de todos los [contribuyentes](https://github.com/your/project/contributors) quíenes han participado en este proyecto. 
-
-## Licencia 📄
-
-Este proyecto está bajo la Licencia (Tu Licencia) - mira el archivo [LICENSE.md](LICENSE.md) para detalles
-
-## Expresiones de Gratitud 🎁
-
-* Comenta a otros sobre este proyecto 📢
-* Invita una cerveza 🍺 o un café ☕ a alguien del equipo. 
-* Da las gracias públicamente 🤓.
-* etc.
-
-
-
----
-⌨️ con ❤️ por [Villanuevand](https://github.com/Villanuevand) 😊
