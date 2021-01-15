@@ -158,3 +158,4 @@ export class ChatPage implements OnInit {
     console.log('Loading dismissed!');
   }
 }
+ 

@@ -23,6 +23,5 @@ export class FirestorageService {
         })
       ).subscribe();
     });
-
   }
 }

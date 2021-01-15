@@ -1,5 +1,7 @@
 {
   "name": "AppPrueba",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular"
 }

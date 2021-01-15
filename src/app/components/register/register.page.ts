@@ -39,13 +39,9 @@ export class RegisterPage implements OnInit {
     public fireAuth: AngularFireAuth,
   ){}
 
-  async ngOnInit(){
- // retorna identificador de user
-    this.segment1 = true;
+  ngOnInit(){
     this.initUser();
-    console.log(this.user);
-    const id = await this.authSvc.getUid();
-    console.log(id);
+    this.segment1 = true;
   }
   initUser(){
     this.user = {
@@ -150,4 +146,5 @@ export class RegisterPage implements OnInit {
     }
 
   }
+
 }

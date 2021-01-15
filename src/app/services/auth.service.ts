@@ -20,7 +20,6 @@ export class AuthService {
   async register(email: string, password: string){
     try{
       await this.fireAuth.createUserWithEmailAndPassword(email, password);
-      await this.sendVerificationEmail();
     }catch (error){
       console.log(error);
     }
@@ -35,13 +34,6 @@ export class AuthService {
     }
   }
 
-  async resetPassword(email: string): Promise<void>{
-    try{
-      return this.fireAuth.sendPasswordResetEmail(email);
-    }catch (error){
-      console.log(error);
-    }
-  }
   async getUid(){ // retorna identificador de user
     const uidUser = await this.fireAuth.currentUser;
     if (uidUser === null){
@@ -51,17 +43,6 @@ export class AuthService {
     }
   }
 
-  isEmailVerified(user: UserInterface){
-    return user.emailVerified === true ? true : false;
-  }
-
-  async sendVerificationEmail(): Promise<void>{
-    try{
-      return (await this.fireAuth.currentUser).sendEmailVerification();
-    }catch (error){
-      console.log('Error', error);
-    }
-  }
   userDetails() {
     return this.fireAuth.user;
   }
@@ -71,7 +52,7 @@ export class AuthService {
   stateAuth(){ // estado de autenticacion
   return this.fireAuth.authState;
   }
- getAuth(){
+  getAuth(){
   return this.fireAuth.authState.pipe(map(auth => auth));
   }
 
