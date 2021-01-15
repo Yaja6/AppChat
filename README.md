@@ -3,7 +3,7 @@
 - Link Video explicativo: https://youtu.be/Shh9WYFxceQ
 
 Descripción de las principales funciones usadas.
-
+*el apk está dentro de la carpeta android del proyecto*
 ## Interfaces creadas: userInterface y messageInterface dentro de la carpeta **models**
 
 **user.interface.ts**
